@@ -5,134 +5,140 @@ const logger = require('../utils/logger');
 const MSG = {
 
   WELCOME:
-    `Hola 👋 Soy el asistente de *Nivra Consulting*.\n\n` +
-    `Ayudamos a empresas a medir y mejorar la coordinación entre áreas — ` +
-    `para que los equipos entreguen mejor servicio interno y eso se refleje en resultados.\n\n` +
-    `¿Qué te trae por aquí?\n` +
-    `1️⃣ Quiero agendar una demo de 20 min\n` +
-    `2️⃣ Quiero saber más antes de decidir\n` +
-    `3️⃣ Solo estoy explorando por ahora`,
+    `Hola. Soy el asistente de *Nivra ISPI*.\n\n` +
+    `Somos una plataforma SaaS que mide cómo se percibe el servicio entre áreas internas de tu organización — ` +
+    `para identificar fricciones operativas y tomar decisiones basadas en datos reales.\n\n` +
+    `¿Cómo prefieres continuar?\n\n` +
+    `*1* — Ver una demo (30 min)\n` +
+    `*2* — Cuéntame más primero`,
 
   // ── Fast Track ──────────────────────────────────────────────────────────────
 
   FAST_1:
-    `Perfecto, en un par de pasos coordinamos tu demo.\n\n` +
+    `Perfecto.\n\n` +
     `¿Cuál es tu nombre y empresa?\n` +
-    `Escríbelo así: 👉 *Nombre / Empresa*`,
+    `Escríbelo así: _Nombre / Empresa_`,
 
   FAST_2: (name) =>
-    `Gracias ${name} 😊\n\n` +
+    `Gracias, ${name}.\n\n` +
     `¿Cuál es tu correo electrónico?\n` +
-    `_(Te enviamos la confirmación y material previo a la demo)_`,
+    `_(Te enviamos la confirmación y el material previo a la demo)_`,
 
   FAST_3:
-    `Último paso. ¿Cuál es tu rol y el tamaño de tu empresa?\n\n` +
-    `1️⃣ RRHH / Personas — menos de 100 personas\n` +
-    `2️⃣ RRHH / Personas — más de 100 personas\n` +
-    `3️⃣ Operaciones, Calidad o DO — menos de 100 personas\n` +
-    `4️⃣ Operaciones, Calidad o DO — más de 100 personas`,
+    `Un último dato para enfocar la demo:\n\n` +
+    `¿Cuántas personas trabajan en tu empresa y cuál es tu área?\n\n` +
+    `*1* Menos de 200 — cualquier área\n` +
+    `*2* 200–1000 — RRHH o Personas\n` +
+    `*3* 200–1000 — Operaciones, Calidad o DO\n` +
+    `*4* Más de 1000 personas`,
 
   DEMO_CALENDLY: (name, url) =>
-    `Todo listo, ${name} 🙌\n\n` +
-    `Elige el horario que mejor te acomode:\n` +
-    `📅 ${url}\n\n` +
-    `La demo dura 20 min. Revisaremos si Nivra aplica a tu situación.`,
+    `Listo, ${name}.\n\n` +
+    `Agenda tu espacio de demo aquí — son 30 minutos, sin presión de venta, ` +
+    `para que veas el producto aplicado a tu contexto:\n\n` +
+    `${url}\n\n` +
+    `Te llega confirmación por email. Cualquier pregunta, escríbeme aquí.`,
 
   DEMO_MANUAL: (name) =>
-    `Todo listo, ${name} 🙌\n\n` +
-    `¿Qué días tienes disponibles?\n` +
-    `1️⃣ Lunes o martes\n` +
-    `2️⃣ Miércoles o jueves\n` +
-    `3️⃣ Viernes\n\n` +
+    `Listo, ${name}.\n\n` +
+    `¿Qué días tienes disponibles?\n\n` +
+    `*1* Lunes o martes\n` +
+    `*2* Miércoles o jueves\n` +
+    `*3* Viernes\n\n` +
     `Un ejecutivo te confirma el link en menos de 2 horas.`,
 
   DEMO_CONFIRM:
-    `Confirmado 🎉\n\n` +
+    `Confirmado.\n\n` +
     `Te escribimos en breve con el enlace de la reunión.\n` +
-    `Mientras tanto: 🌐 *nivraconsulting.com*`,
+    `🌐 *nivraconsulting.com*`,
 
   // ── Info Track ──────────────────────────────────────────────────────────────
 
   INFO_1:
-    `Con gusto 😊 ¿Qué es lo que más te interesa entender?\n\n` +
-    `1️⃣ Qué es el ICSI y cómo funciona el diagnóstico\n` +
-    `2️⃣ Cómo se compara con una encuesta de clima o NPS\n` +
-    `3️⃣ Qué resultados obtienen empresas como la mía`,
+    `Con gusto.\n\n` +
+    `¿Cuál de estas situaciones se parece más a tu empresa?\n\n` +
+    `*1* Tenemos áreas que se quejan entre sí, pero no hay datos objetivos\n` +
+    `*2* Queremos medir si RRHH, TI, Finanzas u Operaciones están cumpliendo sus compromisos internos\n` +
+    `*3* Estamos en un proceso de transformación y necesitamos un diagnóstico cuantitativo`,
 
   INFO_RESP_1:
-    `*¿Qué es el ICSI?*\n\n` +
-    `El Índice de Calidad del Servicio Interno mide qué tan bien se sirven las áreas entre sí.\n\n` +
-    `Nivra corre el diagnóstico en 2–3 semanas, entrega un mapa de brechas por área y propone acciones concretas.\n\n` +
-    `No es una encuesta de clima. Es una herramienta de gestión con resultado accionable.`,
+    `*Fricciones entre áreas sin datos objetivos*\n\n` +
+    `Eso es el "silencio operativo" que mide Nivra ISPI.\n\n` +
+    `La plataforma pregunta a cada área cómo percibe el servicio que recibe de las demás — ` +
+    `y genera un i-NPS interno con dimensiones de calidad: tiempo de respuesta, calidad del entregable, comunicación.\n\n` +
+    `En 2–3 semanas tienes un mapa de brechas por área, no percepciones anecdóticas.`,
 
   INFO_RESP_2:
-    `*ICSI vs. clima vs. NPS*\n\n` +
-    `• Clima mide cómo se *sienten* los empleados.\n` +
+    `*ISPI vs. encuestas de clima o NPS*\n\n` +
+    `• Clima laboral mide cómo se *sienten* los empleados en general.\n` +
     `• NPS mide lealtad del cliente externo.\n` +
-    `• ICSI mide qué tan bien *funciona* la cadena interna de servicio.\n\n` +
-    `Son complementarios. El ICSI responde: *¿dónde se rompe la coordinación?*`,
+    `• ISPI mide si las áreas internas cumplen sus SLAs — comparando el servicio *declarado* con el *percibido*.\n\n` +
+    `El resultado: sabes exactamente qué área genera fricciones y en qué dimensión.`,
 
   INFO_RESP_3:
-    `*Resultados típicos*\n\n` +
-    `Empresas de 80–500 personas identifican 2–4 cuellos de botella críticos en la primera medición.\n\n` +
-    `Con foco en esos puntos, ven mejoras en tiempos de respuesta entre áreas en 60–90 días.\n\n` +
+    `*Diagnóstico cuantitativo en menos de 4 semanas*\n\n` +
+    `Empresas en procesos de transformación usan Nivra ISPI para:\n\n` +
+    `📊 Identificar 2–4 cuellos de botella críticos en la primera medición\n` +
+    `🔄 Medir la brecha entre SLA declarado y SLA percibido por área\n` +
+    `📈 Tomar decisiones de mejora con datos, no con intuición\n\n` +
     `En la demo te mostramos un caso real de tu industria.`,
 
   INFO_CTA:
-    `¿Quieres ver cómo aplicaría esto en tu empresa?\n\n` +
-    `1️⃣ Sí, agendemos la demo\n` +
-    `2️⃣ Tengo más preguntas\n` +
-    `3️⃣ Por ahora no, pero guarda mis datos`,
+    `Eso es exactamente lo que resuelve Nivra ISPI.\n\n` +
+    `La demo de 30 minutos muestra el producto con datos reales de una empresa similar — sin compromisos.\n\n` +
+    `*1* Agendar la demo\n` +
+    `*2* Tengo más preguntas\n` +
+    `*3* Por ahora no, pero guarda mis datos`,
 
   INFO_MORE:
-    `Claro, pregúntame lo que quieras 😊\n\n` +
+    `Claro, pregúntame lo que quieras.\n\n` +
     `_(Cuando estés listo para agendar, escribe *demo*)_`,
 
   INFO_SAVE:
-    `Anotado 🙏\n\n` +
+    `Anotado.\n\n` +
     `Cuando estés listo, escribe *demo* aquí y arrancamos.\n` +
     `🌐 *nivraconsulting.com*`,
 
   // ── Nurturing ───────────────────────────────────────────────────────────────
 
   COLD_LEAD:
-    `Perfecto, sin presión 🙂\n\n` +
-    `Si en algún momento quieres ver cómo funciona el diagnóstico, escribe *demo* aquí.\n\n` +
+    `Sin problema.\n\n` +
+    `Si en algún momento quieres ver el producto, escribe *demo* aquí.\n\n` +
     `🌐 *nivraconsulting.com*`,
 
   RESUME_DEMO:
-    `¡Bienvenido de nuevo! 🙌\n\n` +
+    `Bienvenido de nuevo.\n\n` +
     `¿Cuál es tu nombre y empresa?\n` +
-    `Escríbelo así: 👉 *Nombre / Empresa*`,
+    `Escríbelo así: _Nombre / Empresa_`,
 
   // ── Errores ─────────────────────────────────────────────────────────────────
 
-  INVALID_OPTION: (valid) => `Por favor responde con ${valid} 👆`,
+  INVALID_OPTION: (valid) => `Por favor responde con ${valid}.`,
 
   INVALID_EMAIL:
     `Por favor escribe un correo válido.\nEjemplo: *nombre@empresa.com*`,
 
   INVALID_EMAIL_SKIP:
-    `No hay problema, guardamos tu contacto sin correo.\n\n` +
+    `Sin problema, guardamos tu contacto sin correo.\n\n` +
     `_(Puedes compartírnoslo después en cualquier momento)_`,
 
   FLOW_CLOSED:
-    `Gracias por escribirnos 🙏\nSi tienes más preguntas, estamos aquí.`,
+    `Gracias por escribirnos. Si tienes más preguntas, estamos aquí.`,
 };
 
 // ─── Mapeos ───────────────────────────────────────────────────────────────────
 
 const FAST3_MAP = {
-  '1': { contact_role: 'RRHH/Personas',          company_size: '<100' },
-  '2': { contact_role: 'RRHH/Personas',          company_size: '>100' },
-  '3': { contact_role: 'Operaciones/Calidad/DO', company_size: '<100' },
-  '4': { contact_role: 'Operaciones/Calidad/DO', company_size: '>100' },
+  '1': { contact_role: 'Cualquier área',          company_size: '<200' },
+  '2': { contact_role: 'RRHH/Personas',           company_size: '200-1000' },
+  '3': { contact_role: 'Operaciones/Calidad/DO',  company_size: '200-1000' },
+  '4': { contact_role: 'Cualquier área',          company_size: '>1000' },
 };
 
 const INFO_INTEREST_MAP = {
-  '1': 'icsi-diagnostico',
-  '2': 'comparacion-clima-nps',
-  '3': 'resultados-casos',
+  '1': 'fricciones-sin-datos',
+  '2': 'medir-cumplimiento-areas',
+  '3': 'diagnostico-transformacion',
 };
 
 const INFO_RESP_MAP = {
@@ -259,13 +265,7 @@ async function handleWhatsappMessage(message, senderNumber) {
       session.step = 'INFO_1';
       return MSG.INFO_1;
     }
-    if (opt === '3') {
-      session.data.intent = 'cold';
-      session.step = 'COLD';
-      await saveLead(senderNumber, session.data, 'cold-lead');
-      return MSG.COLD_LEAD;
-    }
-    return MSG.INVALID_OPTION('1, 2 o 3');
+    return MSG.INVALID_OPTION('1 o 2');
   }
 
   // ── FAST_1: nombre / empresa ─────────────────────────────────────────────
