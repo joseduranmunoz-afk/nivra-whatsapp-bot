@@ -7,7 +7,11 @@ function validateTwilioSignature(req, res, next) {
   }
 
   const twilioSignature = req.headers['x-twilio-signature'];
-  const webhookUrl = `${process.env.WEBHOOK_URL}/whatsapp/webhook`;
+
+  // Build URL from the actual incoming request so it always matches what Twilio signed
+  const proto = req.headers['x-forwarded-proto'] || req.protocol;
+  const host  = req.headers['x-forwarded-host']  || req.get('host');
+  const webhookUrl = `${proto}://${host}${req.originalUrl}`;
 
   const isValid = twilio.validateRequest(
     process.env.TWILIO_AUTH_TOKEN,
