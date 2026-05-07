@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "tunnel": "node scripts/dev-tunnel.js",
+    "setup": "node scripts/setup.js"
   },
   "keywords": [
     "whatsapp",
@@ -18,13 +19,14 @@
   "author": "Nivra Consulting",
   "license": "MIT",
   "dependencies": {
-    "express": "^4.18.2",
-    "twilio": "^4.0.0",
     "@anthropic-ai/sdk": "^0.9.0",
+    "axios": "^1.6.0",
     "dotenv": "^16.3.1",
-    "axios": "^1.6.0"
+    "express": "^4.18.2",
+    "twilio": "^4.0.0"
   },
   "devDependencies": {
+    "ngrok": "^5.0.0-beta.2",
     "nodemon": "^3.0.1"
   }
 }
