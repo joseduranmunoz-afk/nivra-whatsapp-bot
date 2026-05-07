@@ -51,8 +51,10 @@ app.post('/whatsapp/webhook', validateTwilioSignature, async (req, res) => {
 
   try {
     const response = await handleWhatsappMessage(incomingMessage, senderNumber);
-    logger.info(`📤 Response to ${senderNumber}: "${response.substring(0, 60)}..."`);
-    twiml.message(response);
+    // response puede ser string o array de strings (para Info Track con 2 mensajes)
+    const messages = Array.isArray(response) ? response : [response];
+    messages.forEach(m => twiml.message(m));
+    logger.info(`📤 Response to ${senderNumber} (${messages.length} msg): "${messages[0].substring(0, 60)}..."`);
   } catch (error) {
     logger.error(`❌ Error handling message from ${senderNumber}:`, error.message);
     twiml.message('Lo siento, ocurrió un error. Por favor intenta de nuevo en un momento. 🙏');
