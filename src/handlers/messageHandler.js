@@ -146,15 +146,9 @@ async function handleWhatsappMessage(message, senderNumber) {
     return `Por favor responde con 1, 2 o 3 👆`;
   }
 
-  // ── MSG_1: tamaño de empresa ─────────────────────────────────────────────
+  // ── MSG_1: tamaño de empresa (solo captura, sin filtro) ──────────────────
   if (step === 'MSG_1') {
-    if (opt === '1') {
-      session.data.company_size = COMP_SIZE['1'];
-      session.step = 'R1';
-      logLead(senderNumber, session.data, 'too-small');
-      return MSG.R1;
-    }
-    if (opt === '2' || opt === '3') {
+    if (opt === '1' || opt === '2' || opt === '3') {
       session.data.company_size = COMP_SIZE[opt];
       session.step = 'MSG_2';
       return MSG.MSG_2;
@@ -208,21 +202,6 @@ async function handleWhatsappMessage(message, senderNumber) {
       return MSG.MSG_5;
     }
     return `Por favor elige 1, 2 o 3 para tu disponibilidad 👆`;
-  }
-
-  // ── R1: empresa < 100 empleados ──────────────────────────────────────────
-  if (step === 'R1') {
-    if (opt === '1') {
-      session.data.lead_status = 'lista-espera';
-      session.step = 'closed';
-      logLead(senderNumber, session.data, 'waitlist');
-      return `Perfecto, te anotamos en la lista 📋\nTe avisaremos cuando tengamos algo para ti. ¡Que te vaya muy bien!`;
-    }
-    if (opt === '2') {
-      session.step = 'R6';
-      return MSG.R6;
-    }
-    return `Por favor responde 1 o 2 👆`;
   }
 
   // ── R2: lead frío (solo exploración) ─────────────────────────────────────
