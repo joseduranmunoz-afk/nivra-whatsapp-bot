@@ -1,4 +1,6 @@
 const logger = require('../utils/logger');
+const { getClient: getSupabase } = require('../utils/supabase');
+const { notifyLead } = require('../utils/notifyLead');
 
 // ─── Mensajes ─────────────────────────────────────────────────────────────────
 
@@ -159,11 +161,32 @@ const leadsStore = [];
 
 async function saveLead(phone, data, tag) {
   const lead = { id: Date.now(), phone, tag, ...data, captured_at: new Date().toISOString() };
+
+  // 1. Persistencia en Supabase (duradera entre deploys)
+  const supabase = getSupabase();
+  if (supabase) {
+    try {
+      const { data: row, error } = await supabase
+        .from('leads')
+        .insert([{ phone, tag, ...data }])
+        .select()
+        .single();
+      if (!error && row) lead.id = row.id;
+    } catch (err) {
+      logger.error(`⚠️ Supabase insert error: ${err.message}`);
+    }
+  }
+
+  // 2. Caché en memoria (para /admin/leads sin latencia)
   leadsStore.push(lead);
 
   const summary = Object.entries(data).map(([k, v]) => `${k}=${v}`).join(', ');
   logger.info(`🎯 LEAD [${tag}] ${phone}: ${summary}`);
 
+  // 3. Notificación WhatsApp al vendedor
+  notifyLead(lead).catch(() => {});
+
+  // 4. Webhook externo opcional
   const webhookUrl = process.env.LEADS_WEBHOOK_URL;
   if (webhookUrl) {
     try {
@@ -187,8 +210,22 @@ async function saveLead(phone, data, tag) {
 }
 
 async function updateLead(leadId, patch) {
+  // Actualizar en memoria
   const lead = leadsStore.find(l => l.id === leadId);
   if (lead) Object.assign(lead, patch);
+
+  // Actualizar en Supabase
+  const supabase = getSupabase();
+  if (supabase && leadId) {
+    try {
+      await supabase
+        .from('leads')
+        .update({ ...patch, updated_at: new Date().toISOString() })
+        .eq('id', leadId);
+    } catch (err) {
+      logger.error(`⚠️ Supabase update error: ${err.message}`);
+    }
+  }
 }
 
 function getLeads() { return leadsStore; }
