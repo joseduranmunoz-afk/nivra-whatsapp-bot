@@ -2,7 +2,7 @@
  * Script de verificación de setup.
  * Uso: node scripts/setup.js
  */
-require('dotenv').config();
+require('dotenv').config({ override: true });
 
 const checks = [
   {

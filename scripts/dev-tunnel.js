@@ -3,7 +3,7 @@
  * Levanta el servidor y crea un túnel público.
  * Uso: node scripts/dev-tunnel.js
  */
-require('dotenv').config();
+require('dotenv').config({ override: true });
 const ngrok = require('ngrok');
 const { execSync, spawn } = require('child_process');
 

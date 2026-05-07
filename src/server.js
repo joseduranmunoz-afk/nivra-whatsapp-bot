@@ -1,4 +1,4 @@
-require('dotenv').config();
+require('dotenv').config({ override: true });
 const express = require('express');
 const twilio = require('twilio');
 const { handleWhatsappMessage } = require('./handlers/messageHandler');
