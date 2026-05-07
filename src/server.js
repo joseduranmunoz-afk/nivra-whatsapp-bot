@@ -1,7 +1,7 @@
 require('dotenv').config({ override: true });
 const express = require('express');
 const twilio = require('twilio');
-const { handleWhatsappMessage } = require('./handlers/messageHandler');
+const { handleWhatsappMessage, getLeads } = require('./handlers/messageHandler');
 const { validateTwilioSignature } = require('./middleware/auth');
 const logger = require('./utils/logger');
 
@@ -22,6 +22,17 @@ app.get('/', (req, res) => {
 
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
+// Endpoint protegido para ver leads capturados
+// Acceso: /admin/leads?token=TU_ADMIN_TOKEN
+app.get('/admin/leads', (req, res) => {
+  const token = process.env.ADMIN_TOKEN;
+  if (token && req.query.token !== token) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+  const leads = getLeads();
+  res.json({ total: leads.length, leads });
 });
 
 app.post('/whatsapp/webhook', validateTwilioSignature, async (req, res) => {
