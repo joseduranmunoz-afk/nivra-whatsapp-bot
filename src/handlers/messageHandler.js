@@ -20,6 +20,12 @@ const MSG = {
     `3️⃣ Desarrollo Organizacional\n` +
     `4️⃣ Otro cargo directivo`,
 
+  MSG_2B:
+    `¿Qué es lo que más te interesa?\n\n` +
+    `1️⃣ Mejora continua\n` +
+    `2️⃣ Medir una vez y después decidir\n` +
+    `3️⃣ Mejorar el servicio al cliente interno`,
+
   MSG_3:
     `Perfecto. Para coordinar una demo de 20 min:\n\n` +
     `¿Cuál es tu nombre y empresa?\n` +
@@ -73,6 +79,7 @@ const MSG = {
 const URGENCY   = { '1': 'alta', '2': 'media', '3': 'exploración' };
 const COMP_SIZE = { '1': '<100', '2': '100-500', '3': '+500' };
 const ROLE      = { '1': 'RRHH/Personas', '2': 'Operaciones/Calidad', '3': 'Desarrollo Organizacional', '4': 'Otro directivo' };
+const INTEREST  = { '1': 'mejora-continua', '2': 'medir-y-decidir', '3': 'mejorar-servicio-interno' };
 const SCHEDULE  = { '1': 'Lunes-Martes', '2': 'Miércoles-Jueves', '3': 'Viernes' };
 
 // ─── Almacén de leads (en memoria + webhook) ──────────────────────────────────
@@ -192,8 +199,8 @@ async function handleWhatsappMessage(message, senderNumber) {
   if (step === 'MSG_2') {
     if (opt === '1' || opt === '2' || opt === '3') {
       session.data.contact_role = ROLE[opt];
-      session.step = 'MSG_3';
-      return MSG.MSG_3;
+      session.step = 'MSG_2B';
+      return MSG.MSG_2B;
     }
     if (opt === '4') {
       session.data.contact_role = ROLE['4'];
@@ -202,6 +209,16 @@ async function handleWhatsappMessage(message, senderNumber) {
       return MSG.R3;
     }
     return `Por favor responde con 1, 2, 3 o 4 👆`;
+  }
+
+  // ── MSG_2B: interés principal ─────────────────────────────────────────────
+  if (step === 'MSG_2B') {
+    if (opt === '1' || opt === '2' || opt === '3') {
+      session.data.main_interest = INTEREST[opt];
+      session.step = 'MSG_3';
+      return MSG.MSG_3;
+    }
+    return `Por favor responde con 1, 2 o 3 👆`;
   }
 
   // ── MSG_3: nombre / empresa ───────────────────────────────────────────────
