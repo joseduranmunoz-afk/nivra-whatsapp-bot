@@ -8,8 +8,8 @@ en todos los proyectos.
 | Dónde | Mecanismo | Cobertura |
 |-------|-----------|-----------|
 | **Local** | `scripts/install-agents.ps1` (una vez) | Todos tus repos locales |
+| **Nube — este repo** | SessionStart hook (`.claude/settings.json`) — **ya activo** | Sesiones de nube de este repo |
 | **Nube — cualquier repo** | Setup script del entorno (UI) | Todos los repos del entorno |
-| **Nube — este repo (opcional)** | SessionStart hook en `.claude/settings.json` | Solo este repo |
 
 ---
 
