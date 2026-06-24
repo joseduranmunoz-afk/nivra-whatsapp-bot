@@ -1,3 +1,4 @@
+const { randomUUID } = require('crypto');
 const logger = require('../utils/logger');
 const { getClient: getSupabase } = require('../utils/supabase');
 const { notifyLead } = require('../utils/notifyLead');
@@ -160,7 +161,9 @@ const SCHEDULE_MAP = {
 const leadsStore = [];
 
 async function saveLead(phone, data, tag) {
-  const lead = { id: Date.now(), phone, tag, ...data, captured_at: new Date().toISOString() };
+  // id sintético único para el caché en memoria (evita colisiones de Date.now()
+  // bajo concurrencia). Si Supabase responde, se reemplaza por el id de fila real.
+  const lead = { id: randomUUID(), phone, tag, ...data, captured_at: new Date().toISOString() };
 
   // 1. Persistencia en Supabase (duradera entre deploys)
   const supabase = getSupabase();
@@ -226,6 +229,18 @@ async function updateLead(leadId, patch) {
       logger.error(`⚠️ Supabase update error: ${err.message}`);
     }
   }
+}
+
+// Crea el lead la primera vez; si la sesión ya tiene uno, lo actualiza.
+// Evita filas duplicadas en Supabase cuando el usuario reentra al flujo (ej: keyword "demo").
+async function upsertLead(session, phone, data, tag) {
+  if (session.leadId) {
+    await updateLead(session.leadId, data);
+    return session.leadId;
+  }
+  const lead = await saveLead(phone, data, tag);
+  session.leadId = lead.id;
+  return lead.id;
 }
 
 function getLeads() { return leadsStore; }
@@ -327,8 +342,7 @@ async function handleWhatsappMessage(message, senderNumber) {
     if (isValidEmail(text)) {
       session.data.email = text.trim().toLowerCase();
       session.emailAttempts = 0;
-      const lead = await saveLead(senderNumber, { ...session.data, lead_status: 'lead-parcial' }, 'lead-parcial');
-      session.leadId = lead.id;
+      await upsertLead(session, senderNumber, { ...session.data, lead_status: 'lead-parcial' }, 'lead-parcial');
       session.step = 'FAST_3';
       return MSG.FAST_3;
     }
@@ -337,8 +351,7 @@ async function handleWhatsappMessage(message, senderNumber) {
     if (session.emailAttempts >= 2) {
       session.data.email = '';
       session.emailAttempts = 0;
-      const lead = await saveLead(senderNumber, { ...session.data, lead_status: 'lead-sin-email' }, 'lead-sin-email');
-      session.leadId = lead.id;
+      await upsertLead(session, senderNumber, { ...session.data, lead_status: 'lead-sin-email' }, 'lead-sin-email');
       session.step = 'FAST_3';
       return [MSG.INVALID_EMAIL_SKIP, MSG.FAST_3];
     }
@@ -405,14 +418,14 @@ async function handleWhatsappMessage(message, senderNumber) {
       return MSG.FAST_1;
     }
     if (opt === '2') {
-      session.infoRound++;
+      // El conteo de rondas se lleva en INFO_MORE; aquí solo abrimos el turno libre.
       session.step = 'INFO_MORE';
       return MSG.INFO_MORE;
     }
     if (opt === '3') {
       session.data.intent = 'info-guardado';
       session.step = 'INFO_SAVED';
-      await saveLead(senderNumber, session.data, 'info-saved');
+      await upsertLead(session, senderNumber, session.data, 'info-saved');
       return MSG.INFO_SAVE;
     }
     return MSG.INVALID_OPTION('1, 2 o 3');
